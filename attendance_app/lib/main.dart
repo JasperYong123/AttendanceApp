@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:attendance_app/attendance_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 
 void main() {
@@ -39,6 +41,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   List _attendances = [];
+  bool timeAgo = false;
 
   Future<void> readJson() async{
     final String response = await rootBundle.loadString('assets/attendance.json');
@@ -62,28 +65,58 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    readJson().whenComplete(() => null);
+    readJson().then((_) {
+    // Convert the date strings to DateTime objects
+    for (var attendance in _attendances) {
+      attendance['check-in'] = DateTime.parse(attendance['check-in']);
+    }
+
+    // Sort the list based on the "check-in" date in ascending order
+    _attendances.sort((a, b) => a['check-in'].compareTo(b['check-in']));
+    
+    // Now, your _attendances list should be sorted.
+  });
     
   }
-
+  
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
 
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: _attendances.length,
-        itemBuilder: (context, index){
-          return Card(
-            child: ListTile(
-              onTap: (){},
-              title: Text(_attendances[index]['user']),
-            ),
-          );
-        }),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: (){setState(() {
+              timeAgo = timeAgo == false;
+            });},
+            child: Text("Change Time format"),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _attendances.length,
+              itemBuilder: (context, index){
+                return Card(
+                  child: ListTile(
+                    onTap: (){},
+                    title: Text(_attendances[index]['user']),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text('Phone:${_attendances[index]['phone']}'),
+                        timeAgo ? Text(timeago.format(DateTime.parse(_attendances[index]['check-in']),locale: 'en')):Text('Date:${_attendances[index]['check-in']}')
+                      ],
+                    ),
+                  ),
+                );
+              }),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
