@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
-
 import 'package:attendance_app/attendance_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,8 +8,11 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
 
 
+import 'package:attendance_app/user_shared_preference.dart';
 
-void main() {
+Future main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreference.init();
   runApp(const MyApp());
 }
 
@@ -40,9 +42,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   List _attendances = [];
-  bool timeAgo = false;
+  bool timeAgo = true;
+
+
 
   Future<void> readJson() async{
     final String response = await rootBundle.loadString('assets/attendance.json');
@@ -52,20 +55,11 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
   
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  
   @override
   void initState() {
     super.initState();
+    timeAgo = SharedPreference.getTimeFormatFromSharedPref();
     readJson().then((_) {
     // Convert the date strings to DateTime objects
     for (var attendance in _attendances) {
@@ -94,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ElevatedButton(
             onPressed: (){setState(() {
               timeAgo = timeAgo == false;
+              SharedPreference.setTimeFormatForSharedPref(timeAgo);
             });},
             child: Text("Change Time format"),
           ),
@@ -119,7 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: (){
+          
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
