@@ -1,5 +1,10 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'dart:convert';
+
 import 'package:attendance_app/attendance_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
 void main() {
@@ -18,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: AttendanceList(),
+      home: MyHomePage(title: "Attendance App"),
     );
   }
 }
@@ -33,6 +38,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  List _attendances = [];
+
+  Future<void> readJson() async{
+    final String response = await rootBundle.loadString('assets/attendance.json');
+    final data = await json.decode(response);
+    setState(() {
+      _attendances = data["attendance"]; 
+    });
+  }
+  
 
   void _incrementCounter() {
     setState(() {
@@ -44,6 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+  @override
+  void initState() {
+    super.initState();
+    readJson().whenComplete(() => null);
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,20 +74,16 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView.builder(
+        itemCount: _attendances.length,
+        itemBuilder: (context, index){
+          return Card(
+            child: ListTile(
+              onTap: (){},
+              title: Text(_attendances[index]['user']),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
+          );
+        }),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
