@@ -44,6 +44,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List _attendances = [];
   bool timeAgo = true;
+  ScrollController _scrollController = ScrollController();
 
 
 
@@ -93,7 +94,22 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Text("Change Time format"),
           ),
           Expanded(
+            child: NotificationListener(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo is ScrollEndNotification &&
+              _scrollController.position.extentAfter == 0) {
+            // User has reached the end of the list
+            // You can show a message here
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('You have reached the end of the list'),
+              ),
+            );
+          }
+          return false;
+        },
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: _attendances.length,
               itemBuilder: (context, index){
                 return Card(
@@ -111,11 +127,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               }),
           ),
-        ],
+      )],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          
+
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
