@@ -6,6 +6,7 @@ import 'package:attendance_app/attendance_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/intl.dart';
 
 
 
@@ -108,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text('Phone:${_attendances[index]['phone']}'),
-                        timeAgo ? Text(timeago.format(DateTime.parse(_attendances[index]['check-in']),locale: 'en')):Text('Date:${_attendances[index]['check-in']}')
+                        timeAgo ? Text(timeago.format(_attendances[index]['check-in'],locale: 'en')):Text('Date:${DateFormat('dd MMM yyyy, h:mm a').format(_attendances[index]['check-in'])}')
                       ],
                     ),
                   ),
