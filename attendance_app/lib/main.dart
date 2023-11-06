@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
+import 'package:attendance_app/attendance_form.dart';
 import 'package:attendance_app/attendance_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,7 +29,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MyHomePage(title: "Attendance App"),
+      // home: MyHomePage(title: "Attendance App"),
+      
+      routes: {
+        '/': (context) => MyHomePage(title: "Attendance App"),
+        '/form' : (context) => AttendanceForm(),
+      },
     );
   }
 }
@@ -131,11 +137,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-
+            Navigator.pushNamed(context, '/form');
         },
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+  
 }
