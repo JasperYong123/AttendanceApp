@@ -13,6 +13,7 @@ class _AttendanceFormState extends State<AttendanceForm> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController dateController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,27 +59,38 @@ class _AttendanceFormState extends State<AttendanceForm> {
                   readOnly: true,
                   onTap: (){_selectDate();},
                 ),
+              ),Padding(
+                padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+                child: TextField(
+                  controller: timeController,
+                  decoration: InputDecoration(
+                      labelText: 'Time',
+                      filled: true,
+                      prefixIcon: Icon(Icons.access_time),
+                      enabledBorder:
+                          OutlineInputBorder(borderSide: BorderSide.none),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue)
+                      )
+                  ),
+                  readOnly: true,
+                  onTap: (){_selectTime();},
+                ),
               ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                      child: ElevatedButton(
-                    child: Text(
-                      'Save',
-                      textScaleFactor: 1.5,
-                    ),
-                    onPressed: () {},
-                  )),
-                  Expanded(
-                      child: ElevatedButton(
-                    child: Text(
-                      'Save',
-                      textScaleFactor: 1.5,
-                    ),
-                    onPressed: () {},
-                  ))
-                ],
-              )
+              Expanded(
+                  child: ElevatedButton(
+                child: Text(
+                  'Save',
+                  textScaleFactor: 1.5,
+                ),
+                onPressed: () {Navigator.pushReplacementNamed(context, '/',
+                  arguments: {
+                    'user': nameController.text,
+                    'phone': phoneController.text,
+                    'check-in':DateTime.parse(dateController.text)
+                  }
+                );},
+              ))
             ],
           ),
         ));
@@ -97,6 +109,24 @@ class _AttendanceFormState extends State<AttendanceForm> {
   }
 
 }
+Future<void> _selectTime()async{
+   DateTime dateTime = DateTime.parse(dateController.text);
+  TimeOfDay? time = await showTimePicker(
+    context: context, 
+    initialTime: TimeOfDay.now(),
+    initialEntryMode: TimePickerEntryMode.dial,
+    );
+  if(time != null){
+    Duration additionalTime = Duration(hours: time.hour, minutes: time.minute);
+    DateTime newDateTime = dateTime.add(additionalTime);
+    dateController.text = newDateTime.toString();
+    setState(() {
+      timeController.text = "${time.hour}:${time.minute}";
+    });
+
+  }
+}
+
 
 }
 

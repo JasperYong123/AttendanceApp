@@ -51,8 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List _attendances = [];
   bool timeAgo = true;
   ScrollController _scrollController = ScrollController();
-
-
+  Map<dynamic, dynamic>? entry = {};
 
   Future<void> readJson() async{
     final String response = await rootBundle.loadString('assets/attendance.json');
@@ -74,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     // Sort the list based on the "check-in" date in ascending order
-    _attendances.sort((a, b) => a['check-in'].compareTo(b['check-in']));
+    _attendances.sort((a, b) => b['check-in'].compareTo(b['check-in']));
     
     // Now, your _attendances list should be sorted.
   });
@@ -83,7 +82,16 @@ class _MyHomePageState extends State<MyHomePage> {
   
   @override
   Widget build(BuildContext context) {
-    
+
+  entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
+  if(entry != null){
+    // print(entry!['check-in'] is String);
+    setState(() {
+      _attendances.add(entry);
+      _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+    });
+  }
+
     return Scaffold(
       appBar: AppBar(
 
@@ -104,8 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onNotification: (ScrollNotification scrollInfo) {
           if (scrollInfo is ScrollEndNotification &&
               _scrollController.position.extentAfter == 0) {
-            // User has reached the end of the list
-            // You can show a message here
+
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('You have reached the end of the list'),
@@ -137,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-            Navigator.pushNamed(context, '/form');
+            Navigator.pushReplacementNamed(context, '/form');
         },
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
