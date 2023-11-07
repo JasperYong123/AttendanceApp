@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
 
   entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
-  if(entry != null){
+  if(entry != null ){
    // print(entry!['check-in'] is String);
     setState(() {
       _attendances.add(entry);
@@ -169,7 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ListTile(
                     leading: CircleAvatar(child: Icon(Icons.keyboard_arrow_right_rounded),),
                     onTap: (){
-                      
+                      Navigator.pushReplacementNamed(context, '/edit',
+                      arguments:_found[index]);
                     },
                     title: Text(_found[index]['user']),
                     subtitle: Row(

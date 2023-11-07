@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 class AttendanceForm extends StatefulWidget {
@@ -14,6 +15,10 @@ class AttendanceForm extends StatefulWidget {
 
 class _AttendanceFormState extends State<AttendanceForm> {
   String title;
+  String name = 'Name';
+  String phone = 'Phone';
+  String date = 'Date';
+  String time = 'Time';
   Map<dynamic, dynamic>? currentRecord = {};
   _AttendanceFormState(this.title);
   TextEditingController nameController = TextEditingController();
@@ -23,8 +28,13 @@ class _AttendanceFormState extends State<AttendanceForm> {
 
   @override
   Widget build(BuildContext context) {
-
-
+    currentRecord = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
+    if(currentRecord != null){
+      name = currentRecord?['user'];
+      phone = currentRecord?['phone'];
+      date = DateFormat('dd MMM yyyy').format(currentRecord?['check-in']);
+      time = DateFormat('h:mm a').format(currentRecord?['check-in']);
+    }
     
     return Scaffold(
         appBar: AppBar(
@@ -40,7 +50,7 @@ class _AttendanceFormState extends State<AttendanceForm> {
                 child: TextField(
                     controller: nameController,
                     decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: name,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5.0)))),
               ),
@@ -49,7 +59,7 @@ class _AttendanceFormState extends State<AttendanceForm> {
                   child: TextField(
                       controller: phoneController,
                       decoration: InputDecoration(
-                          labelText: 'Phone No',
+                          labelText: phone,
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5.0))))),
               Padding(
@@ -57,7 +67,7 @@ class _AttendanceFormState extends State<AttendanceForm> {
                 child: TextField(
                   controller: dateController,
                   decoration: InputDecoration(
-                      labelText: 'Date',
+                      labelText: date,
                       filled: true,
                       prefixIcon: Icon(Icons.calendar_today),
                       enabledBorder:
@@ -74,7 +84,7 @@ class _AttendanceFormState extends State<AttendanceForm> {
                 child: TextField(
                   controller: timeController,
                   decoration: InputDecoration(
-                      labelText: 'Time',
+                      labelText: time,
                       filled: true,
                       prefixIcon: Icon(Icons.access_time),
                       enabledBorder:
