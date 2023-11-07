@@ -83,7 +83,16 @@ class _AttendanceFormState extends State<AttendanceForm> {
                   'Save',
                   textScaleFactor: 1.5,
                 ),
-                onPressed: () {Navigator.pushReplacementNamed(context, '/',
+                onPressed: () {
+                  if(nameController.text.isNotEmpty && phoneController.text.isNotEmpty && dateController.text.isNotEmpty){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('You successfully added a new record to the list'),
+                      
+                    ),
+                    
+                  );}
+                  Navigator.pushReplacementNamed(context, '/',
                   arguments: {
                     'user': nameController.text,
                     'phone': phoneController.text,
@@ -91,7 +100,15 @@ class _AttendanceFormState extends State<AttendanceForm> {
                   }
                 );},
               ))
-            ],
+            ,Expanded(
+                  child: ElevatedButton(
+                child: Text(
+                  'Cancel',
+                  textScaleFactor: 1.5,
+                ),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/');},
+              ))],
           ),
         ));
   }

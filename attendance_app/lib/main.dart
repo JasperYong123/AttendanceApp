@@ -89,7 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
 
   entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
-  if(entry != null){  // print(entry!['check-in'] is String);
+  if(entry != null){
+   // print(entry!['check-in'] is String);
     setState(() {
       _attendances.add(entry);
 
@@ -104,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _attendances = SharedPreference.getListFromSharedPreferences();
       _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
   }
+  
 
     return Scaffold(
       appBar: AppBar(
@@ -134,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           return false;
         },
+          
             child: ListView.builder(
               controller: _scrollController,
               itemCount: _attendances.length,
