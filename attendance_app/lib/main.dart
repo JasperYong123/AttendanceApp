@@ -66,10 +66,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     timeAgo = SharedPreference.getTimeFormatFromSharedPref();
+    _attendances = SharedPreference.getListFromSharedPreferences();
+    if(_attendances.isEmpty){
     readJson().then((_) {
     // Convert the date strings to DateTime objects
     for (var attendance in _attendances) {
-      attendance['check-in'] = DateTime.parse(attendance['check-in']);
+      if(attendance['check-in'] is String){
+      attendance['check-in'] = DateTime.parse(attendance['check-in']);}
     }
 
     // Sort the list based on the "check-in" date in ascending order
@@ -77,6 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
     
     // Now, your _attendances list should be sorted.
   });
+  }
+
     
   }
   
@@ -84,12 +89,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
 
   entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
-  if(entry != null){
-    // print(entry!['check-in'] is String);
+  if(entry != null){  // print(entry!['check-in'] is String);
     setState(() {
       _attendances.add(entry);
-      _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+
+      //_attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+    
     });
+    SharedPreference.saveListToSharedPref(_attendances);
+    
+  }
+  if(SharedPreference.getListFromSharedPreferences().isNotEmpty){
+
+      _attendances = SharedPreference.getListFromSharedPreferences();
+      _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
   }
 
     return Scaffold(
