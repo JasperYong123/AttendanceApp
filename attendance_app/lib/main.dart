@@ -94,6 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Sort and set _found after loading the data
   _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+  SharedPreference.saveListToSharedPref(_attendances);
   _found = _attendances;
   if(firstLogin){
     SharedPreference.setFirstLoginSharedPref(false);
@@ -118,23 +119,23 @@ void initState() {
   }
   
 }
-  
   @override
   Widget build(BuildContext context) {
-  
-  entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
-  if(entry != null && entry1 != entry){
-      _attendances.add(entry);
-      _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
-      _found  = _attendances;
-    SharedPreference.saveListToSharedPref(_attendances);
-    entry1 = entry;
-  }
-
   if(SharedPreference.getListFromSharedPreferences().isNotEmpty ){
       _attendances = SharedPreference.getListFromSharedPreferences();
-      _found = _attendances;// _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+      // _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
   }
+  entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
+  if(entry != null && entry1 != entry){
+
+      _attendances.add(entry);
+      _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+      print(_attendances);
+    SharedPreference.saveListToSharedPref(_attendances);
+    entry1 = entry;
+    _found = _attendances;
+  }
+
   for (var attendance in _found) {
     if(attendance['check-in'] is String){
       // print(attendance['user']);
