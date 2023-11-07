@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool firstLogin = true;
   final ScrollController _scrollController = ScrollController();
   Map<dynamic, dynamic>? entry = {};
-  Map<dynamic, dynamic>? entry1 = {};
+  Map<dynamic, dynamic>? entry1 = {'hi':'hi'};
 
   Future<void> readJson() async{
     final String response = await rootBundle.loadString('assets/attendance.json');
@@ -131,9 +131,9 @@ void initState() {
     entry1 = entry;
   }
 
-  if(SharedPreference.getListFromSharedPreferences().isNotEmpty && SharedPreference.getListFromSharedPreferences().length > _attendances.length){
+  if(SharedPreference.getListFromSharedPreferences().isNotEmpty ){
       _attendances = SharedPreference.getListFromSharedPreferences();
-      // _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+      _found = _attendances;// _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
   }
   for (var attendance in _found) {
     if(attendance['check-in'] is String){
