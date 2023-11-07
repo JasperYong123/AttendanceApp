@@ -2,23 +2,33 @@
 
 import 'package:flutter/material.dart';
 
+
 class AttendanceForm extends StatefulWidget {
-  const AttendanceForm({super.key});
+  String title;
+  AttendanceForm(this.title, {super.key});
+  
 
   @override
-  State<AttendanceForm> createState() => _AttendanceFormState();
+  State<AttendanceForm> createState() => _AttendanceFormState(this.title);
 }
 
 class _AttendanceFormState extends State<AttendanceForm> {
+  String title;
+  Map<dynamic, dynamic>? currentRecord = {};
+  _AttendanceFormState(this.title);
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController timeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+
+
+    
     return Scaffold(
         appBar: AppBar(
-          title: Text('AttendanceForm'),
+          title: Text(title),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
         body: Padding(

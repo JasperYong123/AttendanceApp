@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
       
       routes: {
         '/': (context) => MyHomePage(title: "Attendance App"),
-        '/form' : (context) => AttendanceForm(),
+        '/form' : (context) => AttendanceForm("Add Record"),
+        '/edit' : (context) => AttendanceForm("Edit Record"),
       },
     );
   }
@@ -49,8 +50,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List _attendances = [];
+  List _found = [];
   bool timeAgo = true;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
   Map<dynamic, dynamic>? entry = {};
 
   Future<void> readJson() async{
@@ -61,6 +63,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
   
+  void filter(String keyword){
+    List results =[];
+    if(keyword.isEmpty){
+      results = _attendances;
+    }
+    else{
+      results = _attendances.where((element) => element['user'].toLowerCase().contains(keyword.toLowerCase())).toList();
+      
+    }
+    setState(() {
+        _found = results;
+      });
+  }
   
   @override
   void initState() {
@@ -76,12 +91,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     // Sort the list based on the "check-in" date in ascending order
-    _attendances.sort((a, b) => b['check-in'].compareTo(b['check-in']));
+    _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
     
     // Now, your _attendances list should be sorted.
   });
   }
-
+  _found = _attendances;
     
   }
   
@@ -94,7 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _attendances.add(entry);
 
-      //_attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
     
     });
     SharedPreference.saveListToSharedPref(_attendances);
@@ -105,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _attendances = SharedPreference.getListFromSharedPreferences();
       _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
   }
-  
+  _found = _attendances;
 
     return Scaffold(
       appBar: AppBar(
@@ -122,6 +136,16 @@ class _MyHomePageState extends State<MyHomePage> {
             });},
             child: Text("Change Time format"),
           ),
+          TextField(
+            onChanged: (value) => filter(value),
+            decoration: InputDecoration(
+              labelText: 'Search',
+              suffixIcon: Icon(Icons.search)),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          
           Expanded(
             child: NotificationListener(
         onNotification: (ScrollNotification scrollInfo) {
@@ -139,17 +163,20 @@ class _MyHomePageState extends State<MyHomePage> {
           
             child: ListView.builder(
               controller: _scrollController,
-              itemCount: _attendances.length,
+              itemCount: _found.length,
               itemBuilder: (context, index){
                 return Card(
                   child: ListTile(
-                    onTap: (){},
-                    title: Text(_attendances[index]['user']),
+                    leading: CircleAvatar(child: Icon(Icons.keyboard_arrow_right_rounded),),
+                    onTap: (){
+                      
+                    },
+                    title: Text(_found[index]['user']),
                     subtitle: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('Phone:${_attendances[index]['phone']}'),
-                        timeAgo ? Text(timeago.format(_attendances[index]['check-in'],locale: 'en')):Text('Date:${DateFormat('dd MMM yyyy, h:mm a').format(_attendances[index]['check-in'])}')
+                        Text('Phone:${_found[index]['phone']}'),
+                        timeAgo ? Text(timeago.format(_found[index]['check-in'],locale: 'en')):Text('Date:${DateFormat('dd MMM yyyy, h:mm a').format(_found[index]['check-in'])}')
                       ],
                     ),
                   ),
