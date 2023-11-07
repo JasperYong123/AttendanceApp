@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 import 'package:attendance_app/attendance_form.dart';
-import 'package:attendance_app/attendance_list.dart';
+import 'package:attendance_app/intro_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -30,11 +30,13 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: MyHomePage(title: "Attendance App"),
-      
+      initialRoute: '/',
       routes: {
         '/': (context) => MyHomePage(title: "Attendance App"),
         '/form' : (context) => AttendanceForm("Add Record"),
         '/edit' : (context) => AttendanceForm("Edit Record"),
+        '/intro': (context) => IntroScreen()
+
       },
     );
   }
@@ -52,8 +54,10 @@ class _MyHomePageState extends State<MyHomePage> {
   List _attendances = [];
   List _found = [];
   bool timeAgo = true;
+  bool firstLogin = true;
   final ScrollController _scrollController = ScrollController();
   Map<dynamic, dynamic>? entry = {};
+  Map<dynamic, dynamic>? entry1 = {};
 
   Future<void> readJson() async{
     final String response = await rootBundle.loadString('assets/attendance.json');
@@ -61,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _attendances = data["attendance"]; 
     });
+
   }
   
   void filter(String keyword){
@@ -69,57 +74,73 @@ class _MyHomePageState extends State<MyHomePage> {
       results = _attendances;
     }
     else{
+
       results = _attendances.where((element) => element['user'].toLowerCase().contains(keyword.toLowerCase())).toList();
-      
+      print(results);
     }
     setState(() {
         _found = results;
       });
   }
+  Future<void> loadAttendancesData() async {
+  await readJson();
+
+  // Convert the date strings to DateTime objects
+  for (var attendance in _attendances) {
+    if (attendance['check-in'] is String) {
+      attendance['check-in'] = DateTime.parse(attendance['check-in']);
+    }
+  }
+
+  // Sort and set _found after loading the data
+  _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+  _found = _attendances;
+  if(firstLogin){
+    SharedPreference.setFirstLoginSharedPref(false);
+    Navigator.pushNamed(context, '/intro');
+  }
+
+}
   
   @override
-  void initState() {
-    super.initState();
-    timeAgo = SharedPreference.getTimeFormatFromSharedPref();
-    _attendances = SharedPreference.getListFromSharedPreferences();
-    if(_attendances.isEmpty){
-    readJson().then((_) {
-    // Convert the date strings to DateTime objects
-    for (var attendance in _attendances) {
-      if(attendance['check-in'] is String){
-      attendance['check-in'] = DateTime.parse(attendance['check-in']);}
-    }
-
-    // Sort the list based on the "check-in" date in ascending order
+void initState() {
+  super.initState();
+  timeAgo = SharedPreference.getTimeFormatFromSharedPref();
+  _attendances = SharedPreference.getListFromSharedPreferences();
+  firstLogin = SharedPreference.getFirstLoginFromSharedPref();
+  // Check if _attendances is empty, and if so, load data from JSON
+  if (_attendances.isEmpty) {
+    loadAttendancesData();
+  } else {
+    // If _attendances is not empty, you can directly sort and set _found
     _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
-    
-    // Now, your _attendances list should be sorted.
-  });
+    _found = _attendances;
   }
-  _found = _attendances;
-    
-  }
+  
+}
   
   @override
   Widget build(BuildContext context) {
-
+  
   entry = ModalRoute.of(context)!.settings.arguments as Map<dynamic, dynamic>?;
-  if(entry != null ){
-   // print(entry!['check-in'] is String);
-    setState(() {
+  if(entry != null && entry1 != entry){
       _attendances.add(entry);
-
-    
-    });
-    SharedPreference.saveListToSharedPref(_attendances);
-    
-  }
-  if(SharedPreference.getListFromSharedPreferences().isNotEmpty){
-
-      _attendances = SharedPreference.getListFromSharedPreferences();
       _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+      _found  = _attendances;
+    SharedPreference.saveListToSharedPref(_attendances);
+    entry1 = entry;
   }
-  _found = _attendances;
+
+  if(SharedPreference.getListFromSharedPreferences().isNotEmpty && SharedPreference.getListFromSharedPreferences().length > _attendances.length){
+      _attendances = SharedPreference.getListFromSharedPreferences();
+      // _attendances.sort((a, b) => b['check-in'].compareTo(a['check-in']));
+  }
+  for (var attendance in _found) {
+    if(attendance['check-in'] is String){
+      // print(attendance['user']);
+      attendance['check-in'] = DateTime.parse(attendance['check-in']);}
+  }
+
 
     return Scaffold(
       appBar: AppBar(

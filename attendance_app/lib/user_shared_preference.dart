@@ -49,5 +49,12 @@ static List getListFromSharedPreferences() {
 
   return decodedList;
 }
+  static Future setFirstLoginSharedPref(bool login) async =>
+    await _preferences?.setBool('login', login);
+
+  static bool getFirstLoginFromSharedPref() {
+  bool? temp = _preferences?.getBool('login');
+  return temp ?? true; 
+}
 
 }
